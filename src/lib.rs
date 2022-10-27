@@ -9,7 +9,27 @@ pub struct Logger {
 }
 
 impl Logger {
-    pub fn new(
+    pub async fn new(
+        bucket: String,
+        log_name: String,
+        region: Region,
+        credentials: s3::creds::Credentials,
+    ) -> Self {
+        let bucket = Bucket::new(&bucket, region, credentials).unwrap();
+        // check to see if the object exists in the bucket
+        let log_exists = bucket.head_object(&log_name).await.is_ok();
+        if !log_exists {
+            // create the object if it doesn't exist
+            bucket.put_object(&log_name, b"").await.unwrap();
+        }
+        Self {
+            bucket,
+            log_name,
+            logs: Vec::new(),
+        }
+    }
+
+    pub fn new_blocking(
         bucket: String,
         log_name: String,
         region: Region,
@@ -36,7 +56,26 @@ impl Logger {
         self.logs.push(m);
     }
 
-    pub fn flush(&mut self) {
+    pub async fn flush(&mut self) {
+        // download the file
+        let resp = self.bucket.get_object(&self.log_name).await;
+        let file = resp.unwrap();
+        // convert the file to a utf8 string
+        let mut file_contents = String::new();
+        let b = file.bytes();
+        for byte in b {
+            file_contents.push(*byte as char);
+        }
+        // append the logs to the file
+        file_contents.push_str(&self.logs.join(""));
+        // upload the file
+        self.bucket
+            .put_object(&self.log_name, file_contents.as_bytes())
+            .await
+            .unwrap();
+    }
+
+    pub fn flush_blocking(&mut self) {
         // download the file
         let resp = self.bucket.get_object_blocking(&self.log_name);
         let file = resp.unwrap();
@@ -69,7 +108,7 @@ mod tests {
 
     #[test]
     fn constructor() {
-        let logger = Logger::new(
+        let logger = Logger::new_blocking(
             getenv("BUCKET"),
             "logs.txt".to_string(),
             Region::UsEast2,
@@ -82,7 +121,7 @@ mod tests {
     fn log() {
         let config = s3::creds::Credentials::from_env().unwrap();
 
-        let mut logger = Logger::new(
+        let mut logger = Logger::new_blocking(
             getenv("BUCKET"),
             "logs.txt".to_string(),
             Region::UsEast2,
@@ -90,6 +129,27 @@ mod tests {
         );
         logger.log("hello world");
         logger.log("this is a test");
-        logger.flush();
+        logger.flush_blocking();
+    }
+
+    macro_rules! aw {
+        ($e:expr) => {
+            tokio_test::block_on($e)
+        };
+    }
+
+    #[test]
+    fn log_async() {
+        let config = s3::creds::Credentials::from_env().unwrap();
+
+        let mut logger = aw!(Logger::new(
+            getenv("BUCKET"),
+            "logs.txt".to_string(),
+            Region::UsEast2,
+            config,
+        ));
+        logger.log("hello world");
+        logger.log("this is a test");
+        aw!(logger.flush());
     }
 }

@@ -12,3 +12,6 @@ exclude = ["Justfile"]
 
 [dependencies]
 rust-s3 = { version = "0.32.0", features = ["blocking"] }
+
+[dev-dependencies]
+tokio-test = "0.4.2"
