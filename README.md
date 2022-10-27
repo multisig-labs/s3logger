@@ -5,14 +5,14 @@ This is a super simple logging library for Rust that prints logs to console as w
 # Example
 
 ```rust
-use s3::Credentials;
+use s3::creds::Credentials;
 use s3::Region;
 use s3logger::Logger;
 
 use std::env;
 
 fn main() {
-    let logger = Logger::new_blocking(
+    let mut logger = Logger::new_blocking(
         "my-bucket",
         "my-logs.txt",
         Region::UsEast1,
@@ -25,7 +25,7 @@ fn main() {
 }
 
 async fn main_async() {
-    let logger = Logger::new(
+    let mut logger = Logger::new(
         "my-bucket",
         "my-logs.txt",
         Region::UsEast1,
