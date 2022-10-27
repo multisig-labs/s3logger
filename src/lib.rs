@@ -2,6 +2,7 @@ use s3::Bucket;
 use s3::Region;
 use std::vec::Vec;
 
+// Logger
 pub struct Logger {
     bucket: Bucket,
     log_name: String,
@@ -9,6 +10,7 @@ pub struct Logger {
 }
 
 impl Logger {
+    // asynchronous function to create a new logger
     pub async fn new(
         bucket: String,
         log_name: String,
@@ -29,6 +31,7 @@ impl Logger {
         }
     }
 
+    // blocking function to create a new logger
     pub fn new_blocking(
         bucket: String,
         log_name: String,
@@ -49,6 +52,7 @@ impl Logger {
         }
     }
 
+    // logs to the logger. Does not write to the bucket.
     pub fn log(&mut self, message: &str) {
         println!("{}", message);
         let m = format!("{}\n", message);
@@ -56,6 +60,7 @@ impl Logger {
         self.logs.push(m);
     }
 
+    // asynchronous function to write the logs to the bucket
     pub async fn flush(&mut self) {
         // download the file
         let resp = self.bucket.get_object(&self.log_name).await;
@@ -75,6 +80,7 @@ impl Logger {
             .unwrap();
     }
 
+    // blocking function to write the logs to the bucket
     pub fn flush_blocking(&mut self) {
         // download the file
         let resp = self.bucket.get_object_blocking(&self.log_name);
