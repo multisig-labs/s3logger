@@ -6,7 +6,7 @@ description = "A simple logger that logs to S3"
 authors = ["chand1012"]
 license = "MIT"
 repository = "https://github.com/multisig-labs/s3logger"
-exclude = ["Justfile"]
+exclude = ["Justfile", ".env"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
