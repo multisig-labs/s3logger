@@ -1,0 +1,14 @@
+[package]
+name = "s3logger"
+version = "0.1.0"
+edition = "2021"
+description = "A simple logger that logs to S3"
+authors = ["chand1012"]
+license = "MIT"
+repository = "https://github.com/multisig-labs/s3logger"
+exclude = ["Justfile"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rust-s3 = { version = "0.32.0", features = ["blocking"] }
