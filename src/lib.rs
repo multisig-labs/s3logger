@@ -78,6 +78,9 @@ impl Logger {
             .put_object(&self.log_name, file_contents.as_bytes())
             .await
             .unwrap();
+
+        // clear the logs
+        self.logs.clear();
     }
 
     // blocking function to write the logs to the bucket
@@ -97,6 +100,9 @@ impl Logger {
         self.bucket
             .put_object_blocking(&self.log_name, file_contents.as_bytes())
             .unwrap();
+
+        // clear the logs
+        self.logs.clear();
     }
 }
 
