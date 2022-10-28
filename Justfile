@@ -9,7 +9,11 @@ test-print:
 build:
     cargo build
 
+release:
+    cargo build --release
+
 default: test
 
 clean:
     cargo clean
+    rm *.txt

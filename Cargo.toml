@@ -1,6 +1,6 @@
 [package]
 name = "s3logger"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 description = "A simple logger that logs to S3"
 authors = ["chand1012"]
@@ -13,6 +13,7 @@ documentation = "https://github.com/multisig-labs/s3logger"
 
 [dependencies]
 rust-s3 = { version = "0.32.0", features = ["blocking"] }
+chrono = "0.4.22"
 
 [dev-dependencies]
 tokio-test = "0.4.2"
